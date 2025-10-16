@@ -1,42 +1,43 @@
-import type { HardhatUserConfig } from "hardhat/config";
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-ethers";
+import "@openzeppelin/hardhat-upgrades";
+import "hardhat-deploy";
+// require("@nomiclabs/hardhat-waffle");
+// require("@nomiclabs/hardhat-ethers");
+// require("@openzeppelin/hardhat-upgrades");
+// require("hardhat-deploy");
+require("dotenv").config();
 
-import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
-import { configVariable } from "hardhat/config";
+const { PRIVATE_KEY, INFURA_API_KEY, ETHERSCAN_API_KEY } = process.env;
 
-const config: HardhatUserConfig = {
-  plugins: [hardhatToolboxViemPlugin],
+module.exports = {
   solidity: {
-    profiles: {
-      default: {
-        version: "0.8.28",
-      },
-      production: {
-        version: "0.8.28",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          },
-        },
-      },
-    },
+    version: "0.8.19",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
   },
   networks: {
-    hardhatMainnet: {
-      type: "edr-simulated",
-      chainType: "l1",
-    },
-    hardhatOp: {
-      type: "edr-simulated",
-      chainType: "op",
-    },
     sepolia: {
-      type: "http",
-      chainType: "l1",
-      url: configVariable("SEPOLIA_RPC_URL"),
-      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
+      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      chainId: 11155111,
+    },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${INFURA_API_KEY}`,
+      accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+      chainId: 5,
+    }
+  },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY
+  },
+  namedAccounts: {
+    deployer: {
+      default: 0,
     },
   },
 };
-
-export default config;
